@@ -134,8 +134,14 @@ public class DefaultLogEventMapper {
     }
 
     private Map<String, String> getHeaders(Message message) {
-        Map<String, List<Object>> headers = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
         Map<String, String> result = new HashMap<>();
+        javax.servlet.http.HttpServletResponse response =
+                (javax.servlet.http.HttpServletResponse)message.get("HTTP.RESPONSE");
+        if (response != null) {
+            response.getHeaderNames().forEach(name -> result.put(name, response.getHeaders(name).toString()));
+            return result;
+        }
+        Map<String, List<Object>> headers = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
         if (headers == null) {
             return result;
         }
